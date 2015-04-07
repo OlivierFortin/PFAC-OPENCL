@@ -135,14 +135,35 @@ printf("after vector_add_kernel\r\n");
 	
 	printf("Before");
 	 // Get platform and device information
-    cl_platform_id platform_id = NULL;
-    cl_device_id device_id = NULL;   
+    cl_platform_id platform_id;
+    cl_device_id device_id;   
     cl_uint ret_num_devices;
     cl_uint ret_num_platforms;
+
+   //---------------------------------------------------------
+   //Discover and initialize the platform
+   //---------------------------------------------------------
+   cl_uint nplatforms;
+   cl_platform_id* platforms;
+   cl_platform_id platform;
+   char buffer[256];
+
+   clGetPlatformIDs( 0,0,&nplatforms);
+   platforms = (cl_platform_id*)malloc(nplatforms*sizeof(cl_platform_id));
+   clGetPlatformIDs( nplatforms, platforms, 0);
+   int i= 0;	
+   for(i=0; i<nplatforms; i++) {
+      platform = platforms[i];
+      clGetPlatformInfo(platforms[i],CL_PLATFORM_NAME,256,buffer,0);
+      printf(buffer);
+	if (!strcmp(buffer,"coprthr")) break;
+   }
+   platform_id = platforms[0];
+
     cl_int ret = clGetPlatformIDs(0, &platform_id, &ret_num_platforms);
-    ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_ALL, 1, 
+    ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_ACCELERATOR, 1, 
             &device_id, &ret_num_devices);
-    printf("after get device id\r\n");
+    printf("after get device id err : %d \r\n",ret);
     // Create an OpenCL context
     cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
 printf("after context , error : %d  \r\n",ret);
@@ -161,7 +182,7 @@ printf("after clCreateCommandQueue");
   printf("after create buffer\r\n");
 //************************************************//
 
-h_outputStates[0]= inputL/(16/2) ;
+h_outputStates[0]= 1024;
 
 
 //**************************************************//
@@ -190,12 +211,16 @@ h_outputStates[0]= inputL/(16/2) ;
     
     // Execute the OpenCL kernel on the list
     size_t global_item_size = 16  ; // Process the entire lists
-    size_t local_item_size = 2; // Process in groups of 64
+    size_t local_item_size = 1; // Process in groups of 64
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, 
             &global_item_size, &local_item_size, 0, NULL, NULL);
 
     ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
-
+    int endI = 0;
+	for (endI = 0; endI != 30; ++endI) {
+	printf("%d \n",C[endI]);	
+    }
+ 
    
     ret = clFlush(command_queue);
     ret = clFinish(command_queue);
