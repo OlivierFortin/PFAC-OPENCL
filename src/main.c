@@ -143,7 +143,6 @@ printf("after vector_add_kernel\r\n");
    for(i=0; i<nplatforms; i++) {
       platform = platforms[i];
       clGetPlatformInfo(platforms[i],CL_PLATFORM_NAME,256,buffer,0);
-      printf(buffer);
 	    if (!strcmp(buffer,"coprthr")) break;
    }
    platform_id = platforms[0];
