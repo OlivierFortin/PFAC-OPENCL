@@ -146,7 +146,7 @@ printf("after vector_add_kernel\r\n");
       printf(buffer);
 	    if (!strcmp(buffer,"coprthr")) break;
    }
-   platform_id = platforms[i];
+   platform_id = platforms[0];
 
     cl_int ret = clGetPlatformIDs(0, &platform_id, &ret_num_platforms);
     ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_ACCELERATOR, 1,
