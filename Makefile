@@ -8,7 +8,7 @@ else
 endif
 
 main: main.c
-	 gcc  -Wall -g main.c -o /home/linaro/PFAC-OPENCL4/main2 -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lcoprthr_opencl
+	 gcc  -Wall -g src/main.c -o bin/main -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lcoprthr_opencl
 
 clean:
-	rm -rf main
+	rm -rf bin/main
