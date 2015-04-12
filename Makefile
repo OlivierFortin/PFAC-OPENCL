@@ -7,7 +7,7 @@ else
 	OPTIONS += -std=gnu99  -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lstdcl
 endif
 
-main: main.c
+main: src/main.c
 	 gcc  -Wall -g src/main.c -o bin/main -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lcoprthr_opencl
 
 clean:
