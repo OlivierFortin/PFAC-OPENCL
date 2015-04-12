@@ -199,7 +199,7 @@ h_outputStates[0]= 1024;
 
     // Execute the OpenCL kernel on the list
     size_t global_item_size = 16  ; // Process the entire lists
-    size_t local_item_size = 1; // Process in groups of 64
+    size_t local_item_size = 16; // Process in groups of 64
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL,
             &global_item_size, &local_item_size, 0, NULL, NULL);
 
