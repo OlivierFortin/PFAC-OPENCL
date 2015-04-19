@@ -166,22 +166,25 @@ fclose(stream);
   ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_OutputStates);
 
 
+  printf("Average Time;Global Size;LocalSize\r\n");
+  for (int localInc = 1; localInc != 65; ++localInc) {
+    for (int globalInc = 1; globalInc != 65; ++globalInc) {
 
-  // for (int localInc = 16; localInc != 65; ++localInc) {
-  //   for (int globalInc = 16; globalInc != 65; ++globalInc) {
       double avgTime = 0;
-      for(int avg= 0; avg != 100; ++avg) {
+      for(int avg= 0; avg != 500; ++avg) {
+        size_t global_item_size = localInc  ; // Process the entire lists
+        size_t local_item_size = globalInc; // Process in groups of 64
+        ret = clSetKernelArg(kernel, 4, sizeof(cl_int), &globalInc);
+        ret = clSetKernelArg(kernel, 5, sizeof(cl_int), &localInc);
         //Start timer
         double timeStart;
         struct timeval tpStart;
         gettimeofday (&tpStart, NULL);
         timeStart = (double) (tpStart.tv_sec) + (double) (tpStart.tv_usec) / 1e6;
         // Execute the OpenCL kernel on the list
-        size_t global_item_size = 1  ; // Process the entire lists
-        size_t local_item_size = 16; // Process in groups of 64
         ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL,
                 &global_item_size, &local_item_size, 0, NULL, NULL);
-        ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
+        //ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
 
         //End timer
         struct timeval tpEnd;
@@ -190,19 +193,14 @@ fclose(stream);
         double Texec = timeEnd - timeStart;
         avgTime+= Texec;
         //printf("Execution time : %g\r\n", (Texec));
-        printf('Done %g / 100 \r\n',avg);
+        //printf("Done %g / 100 \r\n",avg);
       }
-      printf("Average time : %g\r\n", (avgTime/100));
-      // printf("Global item size : %g\r\n", (globalInc));
-      // printf("Local item size : %g\r\n", (localInc));
-  //   }
-  // }
-
-  //
-  // int endI = 0;
-  // for (endI = 25; endI != 26; ++endI) {
-  //  printf("%d must be equal to 4\n",C[endI]);
-  // }
+      // printf("Average time : %g\r\n", (avgTime/100));
+      // printf("Global item size : %d\r\n", (globalInc));
+      // printf("Local item size : %d\r\n", (localInc));
+      printf("%g;%d;%d\r\n", (avgTime),globalInc,localInc);
+    }
+  }
 
 
   ret = clFlush(command_queue);

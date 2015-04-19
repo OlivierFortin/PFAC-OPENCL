@@ -16,14 +16,16 @@ if (i>1000) printf("\n\nExecuting Kernel vector_add %d\n", i);
 
 }
 
-__kernel void CheckMatch(__global int *h_input, __global int *h_StatesTab, __global int *h_C, __global int* h_OutputStates){
+__kernel void CheckMatch(__global int *h_input, __global int *h_StatesTab, __global int *h_C, __global int* h_OutputStates,
+  int totalThreadNumber,
+  int threadsPerBlock){
 
 //printf("\nExecuting Kernel CheckMatch %d\n", get_global_id(0));
 
 //*********************************************//
-	int threadsPerBlock=1;
-	int totalThreadNumber= 16;
-	int inputL= 1024 *16;
+	//int threadsPerBlock=1;
+	// int totalThreadNumber= 16;
+	int inputL= 1024 * totalThreadNumber;
 //*********************************************//
 
 
