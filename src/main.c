@@ -34,12 +34,13 @@ int main(void) {
   printf("start\r\n");
   const int Alphabet_Size = 71;
   const int States_Number = 134;
-  const int inputL = 1024 *16 ; // input Lenght
+  const int inputL = 1024 * 16 ; // input Lenght
+  int *h_input = (int*)malloc(sizeof(int)*inputL);
+  int *C = (int*)malloc(sizeof(int)*inputL);
   const int LIST_SIZE = Alphabet_Size* States_Number;
   int *h_StatesTab = (int*)malloc(sizeof(int)*LIST_SIZE);
-  int *h_input = (int*)malloc(sizeof(int)*inputL);
   int *h_outputStates = (int*)malloc(sizeof(int)*States_Number);
-  int *C = (int*)malloc(sizeof(int)*inputL);
+
   FILE* stream2 = fopen("data/StatesTab.csv", "r");
 
   char line2[1024];
@@ -140,11 +141,10 @@ fclose(stream);
   // Create memory buffers on the device for each vector
   cl_mem d_StatesTab = clCreateBuffer(context,  CL_MEM_COPY_HOST_PTR,
           LIST_SIZE * sizeof(int), &h_StatesTab[0], &ret);
-  cl_mem d_input = clCreateBuffer(context,  CL_MEM_COPY_HOST_PTR,
-          inputL * sizeof(int), &h_input[0], &ret);
+
   cl_mem d_OutputStates = clCreateBuffer(context,  CL_MEM_COPY_HOST_PTR,
           States_Number * sizeof(int), &h_outputStates[0], &ret);
-
+  cl_mem d_input = clCreateBuffer(context,  CL_MEM_COPY_HOST_PTR,inputL * sizeof(int), &h_input[0], &ret);
   cl_mem d_C = clCreateBuffer(context,  CL_MEM_COPY_HOST_PTR, inputL * sizeof(int), &C[0], &ret);
 
 
@@ -160,18 +160,22 @@ fclose(stream);
   cl_kernel kernel = clCreateKernel(program, "CheckMatch", &ret);
 
   // Set the arguments of the kernel
-  ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_input);
-  ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&d_StatesTab);
-  ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_C);
-  ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_OutputStates);
 
+  ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&d_StatesTab);
+
+  ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_OutputStates);
+  ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_input);
+  ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_C);
 
   printf("Average Time;Global Size;LocalSize\r\n");
-  for (int localInc = 1; localInc != 17; ++localInc) {
-    for (int globalInc = 1; globalInc != 2; ++globalInc) {
+  for (int localInc = 16; localInc != 17; ++localInc) {
+    for (int globalInc = 16; globalInc != 17; ++globalInc) {
 
       double avgTime = 0;
       for(int avg= 0; avg != 1; ++avg) {
+
+
+
         size_t global_item_size = localInc  ; // Process the entire lists
         size_t local_item_size = globalInc; // Process in groups of 64
         ret = clSetKernelArg(kernel, 4, sizeof(cl_int), &globalInc);
