@@ -125,10 +125,10 @@ fclose(stream);
     clGetPlatformInfo(platforms[i],CL_PLATFORM_NAME,256,buffer,0);
     if (!strcmp(buffer,"coprthr")) break;
   }
-  platform_id = platforms[0];
+  platform_id = platforms[i];
 
   cl_int ret = clGetPlatformIDs(0, &platform_id, &ret_num_platforms);
-  ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_ALL, 1,
+  ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_CPU, 1,
           &device_id, &ret_num_devices);
 
   // Create an OpenCL context
@@ -167,11 +167,11 @@ fclose(stream);
 
 
   printf("Average Time;Global Size;LocalSize\r\n");
-  for (int localInc = 1; localInc != 65; ++localInc) {
-    for (int globalInc = 1; globalInc != 65; ++globalInc) {
+  for (int localInc = 1; localInc != 17; ++localInc) {
+    for (int globalInc = 1; globalInc != 2; ++globalInc) {
 
       double avgTime = 0;
-      for(int avg= 0; avg != 500; ++avg) {
+      for(int avg= 0; avg != 1; ++avg) {
         size_t global_item_size = localInc  ; // Process the entire lists
         size_t local_item_size = globalInc; // Process in groups of 64
         ret = clSetKernelArg(kernel, 4, sizeof(cl_int), &globalInc);
@@ -184,7 +184,7 @@ fclose(stream);
         // Execute the OpenCL kernel on the list
         ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL,
                 &global_item_size, &local_item_size, 0, NULL, NULL);
-        //ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
+        ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
 
         //End timer
         struct timeval tpEnd;
@@ -192,8 +192,12 @@ fclose(stream);
         double timeEnd = (double) (tpEnd.tv_sec) + (double) (tpEnd.tv_usec) / 1e6;
         double Texec = timeEnd - timeStart;
         avgTime+= Texec;
-        //printf("Execution time : %g\r\n", (Texec));
-        //printf("Done %g / 100 \r\n",avg);
+
+        if (C[25] != 4)
+        {
+          printf("ERROR %d\r\n",C[25]);
+        }
+
       }
       // printf("Average time : %g\r\n", (avgTime/100));
       // printf("Global item size : %d\r\n", (globalInc));
