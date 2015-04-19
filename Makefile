@@ -4,7 +4,7 @@ OPTIONS:= -Wmultichar
 ifeq ($(OS),Darwin)
 	OPTIONS += -framework OpenCL
 else
-	OPTIONS += -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lcoprthr_opencl -std=c99
+	OPTIONS += -I/usr/local/browndeer/include -L/usr/local/browndeer/lib -lcoprthr_opencl
 endif
 
 main: src/main.c
