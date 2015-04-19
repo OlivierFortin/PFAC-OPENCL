@@ -166,13 +166,15 @@ fclose(stream);
   ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_OutputStates);
   ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_input);
   ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_C);
-
+  int localInc = 1;
+  int globalInc = 1;
   printf("Average Time;Global Size;LocalSize\r\n");
-  for (int localInc = 16; localInc != 17; ++localInc) {
-    for (int globalInc = 16; globalInc != 17; ++globalInc) {
+  for ( localInc = 16; localInc != 17; ++localInc) {
+    for (globalInc = 16; globalInc != 17; ++globalInc) {
 
       double avgTime = 0;
-      for(int avg= 0; avg != 1; ++avg) {
+      int avg =0;
+      for( avg= 0; avg != 1; ++avg) {
 
 
 
