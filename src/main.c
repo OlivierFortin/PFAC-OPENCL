@@ -165,29 +165,44 @@ fclose(stream);
   ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_C);
   ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_OutputStates);
 
-  //Start timer
-  double timeStart;
-  struct timeval tp;
-  gettimeofday (&tp, NULL);
-  timeStart = (double) (tp.tv_sec) + (double) (tp.tv_usec) / 1e6;
 
-  // Execute the OpenCL kernel on the list
-  size_t global_item_size = 64  ; // Process the entire lists
-  size_t local_item_size = 64; // Process in groups of 64
-  ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL,
-          &global_item_size, &local_item_size, 0, NULL, NULL);
-  ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
 
-  //End timer
-  gettimeofday (&tp, NULL); // Fin du chronometre
-  double timeEnd = (double) (tp.tv_sec) + (double) (tp.tv_usec) / 1e6;
-  double Texec = timeEnd - timeStart;
-  printf("Execution time : %g\r\n", (Texec));
+  // for (int localInc = 16; localInc != 65; ++localInc) {
+  //   for (int globalInc = 16; globalInc != 65; ++globalInc) {
+      double avgTime = 0;
+      for(int avg= 0; avg != 100; ++avg) {
+        //Start timer
+        double timeStart;
+        struct timeval tpStart;
+        gettimeofday (&tpStart, NULL);
+        timeStart = (double) (tpStart.tv_sec) + (double) (tpStart.tv_usec) / 1e6;
+        // Execute the OpenCL kernel on the list
+        size_t global_item_size = 1  ; // Process the entire lists
+        size_t local_item_size = 16; // Process in groups of 64
+        ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL,
+                &global_item_size, &local_item_size, 0, NULL, NULL);
+        ret = clEnqueueReadBuffer(command_queue, d_C, CL_TRUE, 0, inputL * sizeof(int), C, 0, NULL, NULL);
 
-  int endI = 0;
-  for (endI = 25; endI != 26; ++endI) {
-   printf("%d must be equal to 4\n",C[endI]);
-  }
+        //End timer
+        struct timeval tpEnd;
+        gettimeofday (&tpEnd, NULL); // Fin du chronometre
+        double timeEnd = (double) (tpEnd.tv_sec) + (double) (tpEnd.tv_usec) / 1e6;
+        double Texec = timeEnd - timeStart;
+        avgTime+= Texec;
+        //printf("Execution time : %g\r\n", (Texec));
+        printf('Done %g / 100 \r\n',avg);
+      }
+      printf("Average time : %g\r\n", (avgTime/100));
+      // printf("Global item size : %g\r\n", (globalInc));
+      // printf("Local item size : %g\r\n", (localInc));
+  //   }
+  // }
+
+  //
+  // int endI = 0;
+  // for (endI = 25; endI != 26; ++endI) {
+  //  printf("%d must be equal to 4\n",C[endI]);
+  // }
 
 
   ret = clFlush(command_queue);
