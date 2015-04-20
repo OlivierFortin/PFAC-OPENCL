@@ -170,11 +170,11 @@ fclose(stream);
   int globalInc = 1;
   printf("Average Time;Global Size;LocalSize\r\n");
   for ( localInc = 16; localInc != 17; ++localInc) {
-    for (globalInc = 16; globalInc != 17; ++globalInc) {
+    for (globalInc = 1024; globalInc != 1025; ++globalInc) {
 
       double avgTime = 0;
       int avg =0;
-      for( avg= 0; avg != 1; ++avg) {
+      for( avg= 0; avg != 11; ++avg) {
 
 
 
